@@ -1,0 +1,1 @@
+gcloud run deploy scanmypdf-api --source . --region=us-central1
