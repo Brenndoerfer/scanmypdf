@@ -32,10 +32,10 @@ export default function APIPage() {
           <h1>ScanMyPDF API Access and additional features</h1>
           <p className='mt-8 mb-4'>
             <a
-              href='mailto:m.brenndoerfer@outlook.com'
+              href='mailto:hello@michaelbrenndoerfer.com'
               className='text-blue-500 underline'
             >
-              Please reach out
+              Please contact me
             </a>{' '}
             if you need any of the below:
           </p>
@@ -44,6 +44,8 @@ export default function APIPage() {
             <li>Higher upload limit (more MB)</li>
             <li>Longer PDFs (more pages)</li>
             <li>Random looking scans</li>
+            <li>Faster processing</li>
+            <li>Long-term access to files</li>
             <li>Fine grained control over quality, distortion, noise, etc.</li>
             <li>Anything else</li>
           </ul>

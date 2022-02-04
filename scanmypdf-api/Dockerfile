@@ -12,8 +12,9 @@ WORKDIR /code
 COPY ./requirements.txt /code/requirements.txt
 
 # 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-RUN pip install ghostscript
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+# RUN pip install -r requirements.txt
+# RUN pip install ghostscript
 RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
 
 # 

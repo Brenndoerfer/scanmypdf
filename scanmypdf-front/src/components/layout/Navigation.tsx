@@ -1,7 +1,7 @@
 /* This example requires Tailwind CSS v2.0+ */
 const navigation = [
   { name: 'Scan my PDF', href: '/' },
-  { name: 'Free API Access', href: '/api-access' },
+  { name: 'Free API access', href: '/api-access' },
   // { name: 'Docs', href: '#' },
   // { name: 'Company', href: '#' },
 ];

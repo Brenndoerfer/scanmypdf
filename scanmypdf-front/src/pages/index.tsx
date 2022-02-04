@@ -8,10 +8,7 @@ import Seo from '@/components/Seo';
 import Navigation from '../components/layout/Navigation';
 
 import classNames from 'classnames';
-import Image from 'next/image';
-
-import before from '../../public/images/before.jpg';
-import after from '../../public/images/after.jpg';
+import Link from 'next/link';
 
 /**
  * SVGR Support
@@ -22,15 +19,15 @@ import after from '../../public/images/after.jpg';
  */
 
 // !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
-// Before you begin editing, follow all comments with `STARTERCONF`,
-// to customize the default configuration.
 
 export default function HomePage() {
   const [selectedRadio, setRadio] = useState<string>('grayscale');
   const [inProgress, setInProgress] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [url, setUrl] = useState<string>('');
   const ref = useRef();
   const [dots, setDots] = useState<string>('');
+
+  //   console.log('Using: ', process.env.NEXT_PUBLIC_FILE_API);
 
   const uploadOptions = () => {
     return (
@@ -73,19 +70,6 @@ export default function HomePage() {
   };
 
   const FileUploader = () => {
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setDots((d) => {
-          if (d.length > 3) {
-            return (d = '');
-          } else {
-            return (d += '.');
-          }
-        });
-      }, 300);
-      return () => clearInterval(interval);
-    }, []);
-
     const [selectedFile, setFile] = useState<File | null>(null);
 
     const onFileUpload = () => {
@@ -94,8 +78,9 @@ export default function HomePage() {
         return alert('Please select a file');
       }
 
-      if (selectedFile.size / 1024 / 1024 > 10) {
-        return alert('Maximum file size is 10 MB');
+      const MAX_SIZE = 2;
+      if (selectedFile.size / 1024 / 1024 > MAX_SIZE) {
+        return alert(`Maximum file size is ${MAX_SIZE} MB`);
       }
 
       if (selectedFile) {
@@ -103,6 +88,7 @@ export default function HomePage() {
         const formData = new FormData();
         formData.append('file', selectedFile, selectedFile.name);
         formData.append('radio', selectedRadio);
+        setUrl('');
 
         // Details of the uploaded file
 
@@ -113,39 +99,16 @@ export default function HomePage() {
           url: process.env.NEXT_PUBLIC_FILE_API,
           data: formData,
           headers: { 'Content-type': 'multipart/form-data' },
-          responseType: 'blob',
+          //   responseType: 'application/json',
         })
           .then((res) => {
-            // return res.blob();
-            // console.log(res);
-
-            // return res.data.blob();
-            return new Blob([res.data], {
-              type: 'application/pdf',
-            });
-          })
-          .then((blob) => {
-            const href = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = href;
-            link.setAttribute('download', 'scanned_document.pdf'); //or any other extension
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            if (res?.data?.url) setUrl(res.data.url);
           })
           .catch((err) => {
-            // alert('Something went wrong.');
-            // console.error(err)
-            if (err) return err?.response?.data.text();
-          })
-          .then((res) => {
-            if (res) {
-              console.log(res);
-              alert(JSON.parse(res).detail);
-            }
+            if (err?.response?.data?.detail) alert(err.response.data.detail);
           })
           .finally(() => {
-            ref.current.value = '';
+            if (ref?.current?.value) ref.current.value = '';
             setFile(null);
             setInProgress(false);
           });
@@ -242,18 +205,37 @@ export default function HomePage() {
         <section className='mb-8'>
           <h1>Make your PDF look like a scanned document</h1>
           <p className='mt-8'>Make your file look as if it was scanned</p>
-          <div className='color-white mx-auto mt-4 rounded-sm bg-blue-200 p-4 text-left text-sm text-black md:w-1/2'>
-            <b>NO DATA IS STORED</b>: All documents are processed and
-            immediately deleted
-          </div>
-          <p></p>
+
+          {url ? (
+            <div
+              className={classNames(
+                'color-white mx-auto mt-4 rounded-sm  p-4 text-left text-sm text-black md:w-1/2',
+                { 'bg-blue-200': url == '', 'bg-green-200': url != '' }
+              )}
+            >
+              <>
+                <a
+                  target='_blank'
+                  rel='noreferrer'
+                  className='cursor-pointer text-center text-blue-800 underline'
+                  id='downloadLink'
+                  href={url}
+                  download
+                >
+                  <b>DOWNLOAD FILE</b> (the file is available for only one day)
+                </a>
+              </>
+            </div>
+          ) : (
+            ''
+          )}
         </section>
         {FileUploader()}
 
         {inProgress ? (
           <>
             <span className='mt-4 rounded-lg border border-dotted bg-gray-50 p-4 text-sm shadow-md'>
-              Processing can take 10-30 seconds {dots}
+              Please wait - processing usually takes 10-30 seconds
             </span>
           </>
         ) : (
@@ -262,10 +244,10 @@ export default function HomePage() {
         <section className='mt-8'>
           <h2>Why do I need ScanMyPDF.com?</h2>
           <p className='mx-auto mt-4 md:w-2/3'>
-            Some old-school institutions might demand you to print out a PDF and
-            then to scan it back in before submitting. No need to waste ink and
-            paper. We can help. Or you you might simply prefer the look of a
-            scanned document 🤷
+            <b>🌲 Save paper and ink.</b> Some old-school institutions might ask
+            you to print out a PDF and to then just scan it back in before
+            submission, but no worries I got you! (...or you simply prefer the
+            look of a scanned document 🤷)
           </p>
           <div className='mt-8 flex justify-center'>
             <div className=''>
@@ -287,6 +269,17 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+        </section>
+        <section className='mt-8 mb-16'>
+          <h2>Why does it take 10-30 seconds to process a file?</h2>
+          <p className='mx-auto mt-4 '>
+            This service is currently running on the cheapest Google Cloud Run
+            Instance. Please{' '}
+            <Link href='/api-access'>
+              <a className='text-blue-500 underline'>reach out</a>
+            </Link>{' '}
+            if you have specific needs.
+          </p>
         </section>
       </main>
 

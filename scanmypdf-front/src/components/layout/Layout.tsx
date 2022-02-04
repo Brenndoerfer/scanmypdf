@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Script from 'next/script';
+import Footer from './Footer';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   // Put Header or Footer Here
@@ -20,6 +21,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   gtag('config', 'G-CMHXM2GV5X');
   `}
       </Script>
+      <Footer></Footer>
     </div>
   );
 }
